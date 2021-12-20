@@ -1,0 +1,42 @@
+<html>
+  <head></head>
+  <body>
+    <h1>Numbers Chat</h1>
+    <a href="#">Chat</a>
+    <ul></ul>
+    <script>
+      const ul = document.querySelector("ul");
+      const a = document.querySelector("a");
+
+      a.addEventListener("click", async (ev) => {
+        ev.preventDefault();
+        //console.log(ev.target);
+        const response = await fetch("/", {
+          method: "post",
+        });
+        const message = await response.json();
+        ul.innerHTML += `<li> ${message.randomNumber}</li>`;
+        socket.send(JSON.stringify(message));
+      });
+
+      const url = window.document.location.origin.replace("http", "ws");
+      //! gives you whatever local host youre on
+      const socket = new WebSocket(url); //setting up websocket
+      //console.log(url);
+
+      socket.addEventListener("message", (ev) => {
+        //socket is also an event listener, the listener is message. Can end up getting sent a message
+        const message = JSON.parse(ev.data);
+        if (message.history) {
+          message.history.forEach((_message) => {
+            // console.log(_message);
+            // console.log("--", message);
+            ul.innerHTML += `<li> ${_message.randomNumber}</li>`;
+          });
+        } else {
+          ul.innerHTML += `<li> ${message.randomNumber}</li>`;
+        }
+      });
+    </script>
+  </body>
+</html>
